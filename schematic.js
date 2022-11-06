@@ -1,3 +1,19 @@
+/* web reference:
+schematic WorldEdit
+https://github.com/EngineHub/WorldEdit
+https://minecraft.fandom.com/wiki/Schematic_file_format
+*/
+
+/**
+ * hello, I'm flamebousteur and I'm a french developer
+ * You can use and modify this code for free but please keep this comment;
+ * thanks.
+ * 
+ * author: flamebousteur
+ * my web site: https://flamebousteur.github.io
+ * source code: https://github.com/flamebousteur/NBT_JS
+ */
+
 const fs = require('node:fs');
 const { NBT, NBTReader, NBTWriter } = require("./NBT");
 
@@ -12,14 +28,3 @@ class shematicCore extends NBT {
 	setBlock(x, y, z, blockID) {}
 	getBlock(x, y, z) {}
 }
-
-var file = ""
-if (process.argv.length > 2) {
-	file = process.argv[2];
-} else {
-	console.log("No file specified");
-	process.exit(1);
-}
-
-var nbt = new NBTReader(fs.readFileSync(file));
-console.log(nbt.readTag())

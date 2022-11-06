@@ -1,14 +1,19 @@
 /* web reference:
-schematic WorldEdit
-https://github.com/EngineHub/WorldEdit
-
 NBT:
 => https://wiki.vg/NBT <=
 https://web.archive.org/web/20110723210920/http://www.minecraft.net/docs/NBT.txt
-
-https://minecraft.fandom.com/wiki/Schematic_file_format
 https://minecraft.fandom.com/wiki/NBT_format
 */
+
+/**
+ * hello, I'm flamebousteur and I'm a french developer
+ * You can use and modify this code for free but please keep this comment;
+ * thanks.
+ * 
+ * author: flamebousteur
+ * my web site: https://flamebousteur.github.io
+ * source code: https://github.com/flamebousteur/NBT_JS
+ */
 
 const isNode = (typeof module !== "undefined" && typeof module.exports !== "undefined")
 const isWeb = (typeof window !== "undefined" && typeof window.document !== "undefined")
@@ -189,7 +194,6 @@ class NBTReader extends NBT {
 		if (type === NBT.TAG_End) return null;
 		const name = this.readString();
 		const value = this.readTagValue(type);
-		console.log(`Reading tag: ${NBT.getTagName(type)} ${name} ${value}`);
 		return { type, name, value };
 	}
 
@@ -199,12 +203,12 @@ class NBTReader extends NBT {
 			let tag = this.readTag();
 			if (tag === null) break;
 			value[tag.name] = tag.value;
-			console.log("V: ", tag.value)
 		}
 		return value;
 	}
 
 	read() {
+		this.offset = 0;
 		return this.readCompound();
 	}
 }

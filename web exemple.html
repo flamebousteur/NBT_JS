@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="./NBT.js"></script>
+    </head>
+    <body>
+        <script>
+var file = new Buffer(atob("CgAJU2NoZW1hdGljAwAKUGFsZXR0ZU1heAAAAAcKAAdQYWxldHRlAwBebWluZWNyYWZ0OnN0b25lX2JyaWNrX3dhbGxbZWFzdD1sb3csbm9ydGg9bm9uZSxzb3V0aD1ub25lLHVwPXRydWUsd2F0ZXJsb2dnZWQ9ZmFsc2Usd2VzdD1ub25lXQAAAAUDAA9taW5lY3JhZnQ6c3RvbmUAAAAAAwBebWluZWNyYWZ0OnN0b25lX2JyaWNrX3dhbGxbZWFzdD10YWxsLG5vcnRoPW5vbmUsc291dGg9bG93LHVwPXRydWUsd2F0ZXJsb2dnZWQ9ZmFsc2Usd2VzdD1ub25lXQAAAAMDAA1taW5lY3JhZnQ6YWlyAAAABgMAEm1pbmVjcmFmdDphbmRlc2l0ZQAAAAIDABttaW5lY3JhZnQ6cG9saXNoZWRfYW5kZXNpdGUAAAABAwBabWluZWNyYWZ0OmFuZGVzaXRlX3dhbGxbZWFzdD1ub25lLG5vcnRoPWxvdyxzb3V0aD1ub25lLHVwPXRydWUsd2F0ZXJsb2dnZWQ9ZmFsc2Usd2VzdD1sb3ddAAAABAADAAdWZXJzaW9uAAAAAgIABkxlbmd0aAACCgAITWV0YWRhdGEDAAlXRU9mZnNldFgAAAACAwAJV0VPZmZzZXRZ/////wMACVdFT2Zmc2V0WgAAAAEAAgAGSGVpZ2h0AAMDAAtEYXRhVmVyc2lvbgAACzEHAAlCbG9ja0RhdGEAAAAMAAECAgMCAgQFAgYGCQANQmxvY2tFbnRpdGllcwoAAAAAAgAFV2lkdGgAAgsABk9mZnNldAAAAAMAAABxAAAABAAAAaEA"))
+var nbt = new NBTReader(file);
+console.log(nbt.readTag())
+        </script>
+    </body>
+</html>
