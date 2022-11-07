@@ -5,8 +5,7 @@ https://web.archive.org/web/20110723210920/http://www.minecraft.net/docs/NBT.txt
 https://minecraft.fandom.com/wiki/NBT_format
 */
 
-/**
- * hello, I'm flamebousteur and I'm a french developer
+/**hello, I'm flamebousteur and I'm a french developer
  * You can use and modify this code for free but please keep this comment;
  * thanks.
  * 
@@ -18,8 +17,10 @@ https://minecraft.fandom.com/wiki/NBT_format
 const isNode = (typeof module !== "undefined" && typeof module.exports !== "undefined")
 const isWeb = (typeof window !== "undefined" && typeof window.document !== "undefined")
 if (isNode) {
+	// include the zlib module
 	var zlib = require('node:zlib');
 } else if (isWeb) {
+	// recreating Buffer functions for browser vertion
 	Buffer = function (array) {
 		if (typeof array === "string") {
 			// string to Uint8Array
@@ -31,15 +32,30 @@ if (isNode) {
 		}
 		return new Uint8Array(array);
 	}
-	Buffer.prototype.readInt8 = function(offset) { return this[offset]; }
-	Buffer.prototype.readInt16BE = function(offset) { return (this[offset] << 8) | this[offset + 1]; }
-	Buffer.prototype.readInt32BE = function(offset) { return (this[offset] << 24) | (this[offset + 1] << 16) | (this[offset + 2] << 8) | this[offset + 3]; }
-	Buffer.prototype.readBigInt64BE = function(offset) { return (this[offset] << 56n) | (this[offset + 1] << 48n) | (this[offset + 2] << 40n) | (this[offset + 3] << 32n) | (this[offset + 4] << 24n) | (this[offset + 5] << 16n) | (this[offset + 6] << 8n) | this[offset + 7]; }
-	Buffer.prototype.readFloatBE = function(offset) { return new DataView(this.buffer, offset, 4).getFloat32(0); }
-	Buffer.prototype.readDoubleBE = function(offset) { return new DataView(this.buffer, offset, 8).getFloat64(0); }
-	Buffer.prototype.slice = function(start, end) { return this.subarray(start, end); }
-	Buffer.prototype.alloc = function(size) { return new Buffer(size); }
-	Buffer.prototype.set = function(data, offset) { for (let i = 0; i < data.length; i++) this[offset + i] = data[i]; }
+
+	// read
+	Uint8Array.prototype.readInt8 = function(offset) { return this[offset]; }
+	Uint8Array.prototype.readInt16BE = function(offset) { return (this[offset] << 8) | this[offset + 1]; }
+	Uint8Array.prototype.readInt32BE = function(offset) { return (this[offset] << 24) | (this[offset + 1] << 16) | (this[offset + 2] << 8) | this[offset + 3]; }
+	Uint8Array.prototype.readBigInt64BE = function(offset) { return (this[offset] << 56n) | (this[offset + 1] << 48n) | (this[offset + 2] << 40n) | (this[offset + 3] << 32n) | (this[offset + 4] << 24n) | (this[offset + 5] << 16n) | (this[offset + 6] << 8n) | this[offset + 7]; }
+	Uint8Array.prototype.readFloatBE = function(offset) { return new DataView(this.buffer, offset, 4).getFloat32(0); }
+	Uint8Array.prototype.readDoubleBE = function(offset) { return new DataView(this.buffer, offset, 8).getFloat64(0); }
+	Uint8Array.prototype.slice = function(start, end) { return this.subarray(start, end); }
+	Uint8Array.prototype.set = function(data, offset) { for (let i = 0; i < data.length; i++) this[offset + i] = data[i]; }
+	
+	// write (no ready)
+	Uint8Array.prototype.write = function(value, offset) {}
+	Uint8Array.prototype.writeInt8
+	Uint8Array.prototype.writeInt16BE
+	Uint8Array.prototype.writeInt32BE
+	Uint8Array.prototype.writeBigInt64BE
+	Uint8Array.prototype.writeFloatBE
+	Uint8Array.prototype.writeDoubleBE
+
+	Uint8Array.prototype.toString = function(format) { return String.fromCharCode.apply(null,this) }
+
+	// static
+	Buffer.alloc = function(size) { return new Buffer(size); }
 	Buffer.from = function(data) { return new Buffer(data); }
 	Buffer.concat = function(list) {
 		let size = 0;
@@ -54,7 +70,7 @@ if (isNode) {
 	}
 } else throw new Error("Unsupported environment");
 
-class NBT {
+class NBT_Tag {
 	static tagTypes = {
 		END: 0,
 		BYTE: 1,
@@ -85,13 +101,12 @@ class NBT {
 	static TAG_Int_Array = 11; // An array of signed 32-bit integers
 	static TAG_Long_Array = 12; // An array of signed 64-bit integers
 
-	static getTagType(type) { return NBT.tagTypes[type]; }
-	static getTagName(type) { return Object.keys(NBT.tagTypes).find((key) => NBT.tagTypes[key] === type); }
+	static getTagType(type) { return NBT_Tag.tagTypes[type]; }
+	static getTagName(type) { return Object.keys(NBT_Tag.tagTypes).find((key) => NBT_Tag.tagTypes[key] === type); }
 }
 
-class NBTReader extends NBT {
+class NBTReader {
 	constructor(buffer) {
-		super();
 		if (buffer[0] === 0x1f && buffer[1] === 0x8b) buffer = zlib.gunzipSync(buffer);
 		this.buffer = buffer;
 		this.offset = 0;
@@ -172,26 +187,26 @@ class NBTReader extends NBT {
 
 	readTagValue(type) {
 		switch (type) {
-			case NBT.TAG_End: return null; // 00
-			case NBT.TAG_Byte: return this.readByte(); // 01
-			case NBT.TAG_Short: return this.readShort(); // 02
-			case NBT.TAG_Int: return this.readInt(); // 03
-			case NBT.TAG_Long: return this.readLong(); // 04
-			case NBT.TAG_Float: return this.readFloat(); // 05
-			case NBT.TAG_Double: return this.readDouble(); // 06
-			case NBT.TAG_Byte_Array: return this.readByteArray(); // 07
-			case NBT.TAG_String: return this.readString(); // 08
-			case NBT.TAG_List: return this.readList(); // 09
-			case NBT.TAG_Compound: return this.readCompound(); // 10
-			case NBT.TAG_Int_Array: return this.readIntArray(); // 11
-			case NBT.TAG_Long_Array: return this.readLongArray(); // 12
+			case NBT_Tag.TAG_End: return null; // 00
+			case NBT_Tag.TAG_Byte: return this.readByte(); // 01
+			case NBT_Tag.TAG_Short: return this.readShort(); // 02
+			case NBT_Tag.TAG_Int: return this.readInt(); // 03
+			case NBT_Tag.TAG_Long: return this.readLong(); // 04
+			case NBT_Tag.TAG_Float: return this.readFloat(); // 05
+			case NBT_Tag.TAG_Double: return this.readDouble(); // 06
+			case NBT_Tag.TAG_Byte_Array: return this.readByteArray(); // 07
+			case NBT_Tag.TAG_String: return this.readString(); // 08
+			case NBT_Tag.TAG_List: return this.readList(); // 09
+			case NBT_Tag.TAG_Compound: return this.readCompound(); // 10
+			case NBT_Tag.TAG_Int_Array: return this.readIntArray(); // 11
+			case NBT_Tag.TAG_Long_Array: return this.readLongArray(); // 12
 			default: throw new Error(`Unknown tag type: ${type} ${this.offset}`);
 		}
 	}
 
 	readTag() {
 		const type = this.readByte();
-		if (type === NBT.TAG_End) return null;
+		if (type === NBT_Tag.TAG_End) return null;
 		const name = this.readString();
 		const value = this.readTagValue(type);
 		return { type, name, value };
@@ -213,35 +228,34 @@ class NBTReader extends NBT {
 	}
 }
 
-class NBTWriter extends NBT {
-	constructor(JSON) {
-		super();
-		this.JSON = JSON;
+class NBTWriter {
+	constructor(data) {
+		this.data = data;
 		this.buffer = Buffer.alloc(0);
 	}
 
 	getTagType(value) {
-		if (typeof value === 'string') return NBT.TAG_String; // string
+		if (typeof value === 'string') return NBT_Tag.TAG_String; // string
 		if (typeof value === 'number') {
 			if (Number.isInteger(value)) {
-				if (value >= -128 && value <= 127) return NBT.TAG_Byte; // byte
-				if (value >= -32768 && value <= 32767) return NBT.TAG_Short; // short
-				if (value >= -2147483648 && value <= 2147483647) return NBT.TAG_Int; // int
-				return NBT.TAG_Long; // long
+				if (value >= -128 && value <= 127) return NBT_Tag.TAG_Byte; // byte
+				if (value >= -32768 && value <= 32767) return NBT_Tag.TAG_Short; // short
+				if (value >= -2147483648 && value <= 2147483647) return NBT_Tag.TAG_Int; // int
+				return NBT_Tag.TAG_Long; // long
 			}
-			if (n % 1 !== 0)  if (Math.abs(value) < 3.4028234663852886e+38) return NBT.TAG_Float; // float
-			return NBT.TAG_Double; // double
+			if (n % 1 !== 0)  if (Math.abs(value) < 3.4028234663852886e+38) return NBT_Tag.TAG_Float; // float
+			return NBT_Tag.TAG_Double; // double
 		}
 		// array
 		if (Array.isArray(value)) {
-			if (value.length === 0) return NBT.TAG_List; // empty array
-			if (value.every((v) => Number.isInteger(v) && v >= 0 && v <= 255)) return NBT.TAG_Byte_Array; // byte array
-			if (value.every((v) => typeof v === 'number' && Number.isInteger(v))) return NBT.TAG_Int_Array; // int array
-			if (value.every((v) => typeof v === 'bigint')) return NBT.TAG_Long_Array; // long array
-			return NBT.TAG_List; // list
+			if (value.length === 0) return NBT_Tag.TAG_List; // empty array
+			if (value.every((v) => Number.isInteger(v) && v >= 0 && v <= 255)) return NBT_Tag.TAG_Byte_Array; // byte array
+			if (value.every((v) => typeof v === 'number' && Number.isInteger(v))) return NBT_Tag.TAG_Int_Array; // int array
+			if (value.every((v) => typeof v === 'bigint')) return NBT_Tag.TAG_Long_Array; // long array
+			return NBT_Tag.TAG_List; // list
 		}
-		if (value === null) return NBT.TAG_End; // end
-		return NBT.TAG_Compound; // compound
+		if (value === null) return NBT_Tag.TAG_End; // end
+		return NBT_Tag.TAG_Compound; // compound
 	}
 
 	writeByte(value) {
@@ -306,24 +320,24 @@ class NBTWriter extends NBT {
 			this.writeString(key);
 			this.writeTagValue(type, value[key]);
 		}
-		this.writeByte(NBT.TAG_End);
+		this.writeByte(NBT_Tag.TAG_End);
 	}
 
 	writeTagValue(type, value) {
 		switch (type) {
-			case NBT.TAG_End: return; // 00
-			case NBT.TAG_Byte: return this.writeByte(value); // 01
-			case NBT.TAG_Short: return this.writeShort(value); // 02
-			case NBT.TAG_Int: return this.writeInt(value); // 03
-			case NBT.TAG_Long: return this.writeLong(value); // 04
-			case NBT.TAG_Float: return this.writeFloat(value); // 05
-			case NBT.TAG_Double: return this.writeDouble(value); // 06
-			case NBT.TAG_Byte_Array: return this.writeByteArray(value); // 07
-			case NBT.TAG_String: return this.writeString(value); // 08
-			case NBT.TAG_List: return this.writeList(value); // 09
-			case NBT.TAG_Compound: return this.writeCompound(value); // 10
-			case NBT.TAG_Int_Array: return this.writeIntArray(value); // 11
-			case NBT.TAG_Long_Array: return this.writeLongArray(value); // 12
+			case NBT_Tag.TAG_End: return; // 00
+			case NBT_Tag.TAG_Byte: return this.writeByte(value); // 01
+			case NBT_Tag.TAG_Short: return this.writeShort(value); // 02
+			case NBT_Tag.TAG_Int: return this.writeInt(value); // 03
+			case NBT_Tag.TAG_Long: return this.writeLong(value); // 04
+			case NBT_Tag.TAG_Float: return this.writeFloat(value); // 05
+			case NBT_Tag.TAG_Double: return this.writeDouble(value); // 06
+			case NBT_Tag.TAG_Byte_Array: return this.writeByteArray(value); // 07
+			case NBT_Tag.TAG_String: return this.writeString(value); // 08
+			case NBT_Tag.TAG_List: return this.writeList(value); // 09
+			case NBT_Tag.TAG_Compound: return this.writeCompound(value); // 10
+			case NBT_Tag.TAG_Int_Array: return this.writeIntArray(value); // 11 not implemented yet
+			case NBT_Tag.TAG_Long_Array: return this.writeLongArray(value); // 12 not implemented yet
 			default: throw new Error(`Unknown tag type: ${type}`);
 		}
 	}
@@ -336,11 +350,20 @@ class NBTWriter extends NBT {
 	}
 
 	write() {
-		this.writeCompound(this.JSON);
+		this.offset = Buffer.alloc(0);
+		this.writeCompound(this.data);
 		return this.buffer;
 	}
 }
 
-if (isNode) module.exports = { NBT, NBTReader, NBTWriter };
-else if (isWeb) window.NBT = { NBT, NBTReader, NBTWriter };
+class NBT {
+	static NBT_Tag = NBT_Tag
+	static NBTReader = NBTReader
+	static NBTWriter = NBTWriter
+	static parse(buffer) { return new NBTReader(buffer).read(); }
+	static build(data) { return new NBTWriter(data).write(); }
+}
+
+if (isNode) module.exports = { NBT_Tag, NBTReader, NBTWriter, NBT };
+else if (isWeb) window.NBT = { NBT_Tag, NBTReader, NBTWriter, NBT };
 else throw new Error("Unsupported environment");

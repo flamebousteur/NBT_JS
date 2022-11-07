@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-const { NBT, NBTReader, NBTWriter } = require("./NBT");
+const { NBTReader, NBTWriter, NBT_Tag, NBT } = require("./NBT");
 
 var file = ""
 if (process.argv.length > 2) file = process.argv[2];
@@ -8,5 +8,4 @@ else {
 	process.exit(1);
 }
 
-var nbt = new NBTReader(fs.readFileSync(file));
-console.log(nbt.read())
+console.log(NBT.parse(fs.readFileSync(file)))
