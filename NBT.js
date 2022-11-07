@@ -323,6 +323,16 @@ class NBTWriter {
 		this.writeByte(NBT_Tag.TAG_End);
 	}
 
+	writeIntArray(value) {
+		this.writeInt(value.length);
+		for (let i = 0; i < value.length; i++) this.writeInt(value[i]);
+	}
+
+	writeLongArray(value) {
+		this.writeInt(value.length);
+		for (let i = 0; i < value.length; i++) this.writeLong(value[i]);
+	}
+
 	writeTagValue(type, value) {
 		switch (type) {
 			case NBT_Tag.TAG_End: return; // 00
@@ -336,8 +346,8 @@ class NBTWriter {
 			case NBT_Tag.TAG_String: return this.writeString(value); // 08
 			case NBT_Tag.TAG_List: return this.writeList(value); // 09
 			case NBT_Tag.TAG_Compound: return this.writeCompound(value); // 10
-			case NBT_Tag.TAG_Int_Array: return this.writeIntArray(value); // 11 not implemented yet
-			case NBT_Tag.TAG_Long_Array: return this.writeLongArray(value); // 12 not implemented yet
+			case NBT_Tag.TAG_Int_Array: return this.writeIntArray(value); // 11
+			case NBT_Tag.TAG_Long_Array: return this.writeLongArray(value); // 12
 			default: throw new Error(`Unknown tag type: ${type}`);
 		}
 	}
@@ -349,10 +359,10 @@ class NBTWriter {
 		this.writeTagValue(type, value);
 	}
 
-	write() {
+	write(compressed = false) {
 		this.offset = Buffer.alloc(0);
 		this.writeCompound(this.data);
-		return this.buffer;
+		return compressed ? zlib.gzipSync(this.buffer) : this.buffer;
 	}
 }
 

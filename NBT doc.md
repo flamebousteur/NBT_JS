@@ -149,7 +149,7 @@ write the full data
 return (Buffer): the data in the NBT format
 
 ## NBT
-contain the NBT class
+contain the different NBT classes
 {
     NBT_Tag
     NBTReader
@@ -164,7 +164,8 @@ return (Object)
 
 ```js
 var nbt = new NBTReader(fileContent);
-console.log(JSON.stringify(nbt.read()))
+console.log(nbt.read())
+// {"name":{}}
 ```
 
 ### build(data)
@@ -172,3 +173,9 @@ data (Objet)
 > use the NBTWriter to change the Object into a Buffet
 
 return (Buffer)
+
+```js
+var nbt = new NBTWriter(data);
+console.log(nbt.write())
+// <Buffer ... >
+```
