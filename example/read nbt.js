@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-const { NBTReader, NBTWriter, NBT_Tag, NBT } = require("./NBT");
+const { NBTReader, NBTWriter, NBT_Tag, NBT } = require("../src/NBT");
 
 var file = ""
 if (process.argv.length > 2) file = process.argv[2];
