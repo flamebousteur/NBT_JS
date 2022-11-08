@@ -79,6 +79,8 @@ class Structure {
 		this.depth = depth;
 		this.blocks = new Uint16Array(width * height * depth);
 		this.palette = [];
+		this.position = { x: 0, y: 0, z: 0 };
+		this.ContentStructures = [];
 	}
 
 	setBlock(x, y, z, blockData) {
