@@ -371,7 +371,7 @@ class NBT {
 	static NBTReader = NBTReader
 	static NBTWriter = NBTWriter
 	static parse(buffer) { return new NBTReader(buffer).read(); }
-	static build(data) { return new NBTWriter(data).write(); }
+	static build(data, compressed = false) { return new NBTWriter(data).write(compressed); }
 }
 
 if (isNode) module.exports = { NBT_Tag, NBTReader, NBTWriter, NBT };
