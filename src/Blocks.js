@@ -8,6 +8,9 @@
  * source code: https://github.com/flamebousteur/NBT_JS
  */
 
+var isNode = (typeof module !== "undefined" && typeof module.exports !== "undefined")
+var isWeb = (typeof window !== "undefined" && typeof window.document !== "undefined")
+
 class Blocks {
 	constructor(name, properties = {}, nbt = {}) {
 		this.name = name;
@@ -58,8 +61,11 @@ class Blocks {
 
 	toString() { return this.name + (Object.keys(this.properties).length > 0 ? '[' + Object.entries(this.properties).map(([k, v]) => k + '=' + v).join(',') + ']' : ''); }
 
-	getName() { return this.name; }
 	setName(name) { this.name = name; }
+	getName() { return this.name; }
 	setPropertie(key, value) { this.properties[key] = value; }
 	getPropertie(key) { return this.properties[key]; }
+	removerRopertie(key) { delete this.properties[key]; }
 }
+
+module.exports = Blocks

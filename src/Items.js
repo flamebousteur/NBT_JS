@@ -8,6 +8,9 @@
  * source code: https://github.com/flamebousteur/NBT_JS
  */
 
+var isNode = (typeof module !== "undefined" && typeof module.exports !== "undefined")
+var isWeb = (typeof window !== "undefined" && typeof window.document !== "undefined")
+
 class Items {
     constructor(name, count = 1, tags = {}) {
         this.name = name;
@@ -19,3 +22,7 @@ class Items {
     getTag(key) { return this.tags[key]; }
     removeTag(key) { delete this.tags[key]; }
 }
+
+if (isNode) module.exports = Items
+else if (isWeb) window.Items = Items
+else throw new Error("Unsupported environment");
