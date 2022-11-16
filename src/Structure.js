@@ -127,6 +127,10 @@ class Structure {
 		});
 		return { "": nbt };
 	}
+
+	rotateBlock({ x = 0, y = 0, z = 0 } = {}, { rx = 0, ry = 0, rz = 0 } = {}) { // rotate the blocks of the structure around the point (x, y, z) by the angles (rx, ry, rz)
+		let blocks = new Uint16Array(this.width * this.height * this.depth);
+	}
 }
 
 class ComplexStruct {
@@ -250,98 +254,15 @@ class ComplexStruct {
 
 	build() { return NBT.build(this.toNBT()); }
 
-	getStructureSize(id) { // calculate the size of the structure (including childs)
-		let structure = this.structures.find(s => s.ID == id);
-		if (structure == undefined) throw new Error("structure not found");
-		let size = { width: structure.size.width, height: structure.size.height, depth: structure.size.depth };
-		if (structure.childs != undefined) {
-			structure.childs.forEach(c => {
-				let child = this.structures.find(s => s.ID == c.childID);
-				if (child == undefined) throw new Error("child not found");
-				let childSize = this.getStructureSize(c.childID);
-				let pos = c.position;
-				if (c.rotation != undefined) {
-					let rot = c.rotation;
-					let rotX = rot.x % 360;
-					let rotY = rot.y % 360;
-					let rotZ = rot.z % 360;
-					if (rotX == 90 || rotX == 270) {
-						let temp = childSize.width;
-						childSize.width = childSize.depth;
-						childSize.depth = temp;
-					}
-					if (rotY == 90 || rotY == 270) {
-						let temp = childSize.width;
-						childSize.width = childSize.height;
-						childSize.height = temp;
-					}
-					if (rotZ == 90 || rotZ == 270) {
-						let temp = childSize.height;
-						childSize.height = childSize.depth;
-						childSize.depth = temp;
-					}
+	// get size() { return this.getStructureSize(this.rootID); } // calculate the size of the structure { width: 0, height: 0, depth: 0 }
+	// compile() { } // compile the structure to a new simple Structure Object
+}
 
-					if (rotX == 180 || rotY == 180 || rotZ == 180) {
-						pos.x = -pos.x;
-						pos.y = -pos.y;
-						pos.z = -pos.z;
-					}
-
-					if (rotX == 90 || rotX == 270) { pos.z = -pos.z; pos.x += childSize.depth; }
-					if (rotY == 90 || rotY == 270) { pos.x = -pos.x; pos.y += childSize.height; }
-					if (rotZ == 90 || rotZ == 270) { pos.y = -pos.y; pos.z += childSize.width; }
-				}
-				if (c.mirror != undefined) {
-					let mir = c.mirror;
-					if (mir.x == true) {
-						pos.x = -pos.x;
-						childSize.width = -childSize.width;
-					}
-					if (mir.y == true) {
-						pos.y = -pos.y;
-						childSize.height = -childSize.height;
-					}
-					if (mir.z == true) {
-						pos.z = -pos.z;
-						childSize.depth = -childSize.depth;
-					}
-				}
-				if (pos.x < 0) {
-					size.width += Math.abs(pos.x);
-					pos.x = 0;
-				}
-				if (pos.y < 0) {
-					size.height += Math.abs(pos.y);
-					pos.y = 0;
-				}
-				if (pos.z < 0) {
-					size.depth += Math.abs(pos.z);
-					pos.z = 0;
-				}
-				if (pos.x + childSize.width > size.width) size.width = pos.x + childSize.width;
-				if (pos.y + childSize.height > size.height) size.height = pos.y + childSize.height;
-				if (pos.z + childSize.depth > size.depth) size.depth = pos.z + childSize.depth;
-			});
-		}
-		return size;
-	}
-
-	get size() { return this.getStructureSize(this.rootID); } // calculate the size of the structure { width: 0, height: 0, depth: 0 }
-
-	compile() { // compile the structure to a new Structure Object
-		let structure = new Structure();
-		let size = this.size;
-		structure.data = new Array(size.width * size.height * size.depth).fill(0);
-		let palette = [];
-		let blocks = [];
-
-		structure.width = width;
-		structure.height = height;
-		structure.depth = depth;
-		structure.blocks = new Uint16Array(width * height * depth);
-		structure.palette = [new Blocks("void")];
+class StructControle extends ComplexStruct {
+	constructor() {
+		super({ width = 1, height = 1, depth = 1 } = {});
 	}
 }
 
-if (isNode) module.exports = { Structure, ComplexStruct };
-else if (isWeb) window.Structure = { Structure, ComplexStruct };
+if (isNode) module.exports = { Structure, ComplexStruct, StructControle };
+else if (isWeb) window.Structure = { Structure, ComplexStruct, StructControle };
