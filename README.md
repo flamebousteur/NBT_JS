@@ -4,7 +4,7 @@ Schematic class documentation >> [doc](./Schematic%20doc.md)
 
 files checked:
 - hotbar.nbt: read and write
-```json
+```jsonc
 {
   "": {
     "< 0 to 8 >": [
